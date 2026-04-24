@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <title>Project Show Me The Money (Coupa Direct Procurement)</title>
+  <style>
+    :root {
+      --bg:       #0d0d0d;
+      --slide-bg: #111111;
+      --gold:     #D4AF37;
+      --gold-dim: #a88a1e;
+      --border:   #2e2e2e;
+      --header-bg:#1a1a1a;
+      --row-bg:   #151515;
+      --white:    #ffffff;
+      --yes:      #4CAF50;
+      --flex:     #D4AF37;
+      --no:       #e53935;
+      --card-bg:  #181818;
+      --text-muted:#aaaaaa;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+      color: var(--white);
+    }
+
+    /* ===== DECK WRAPPER ===== */
+    .deck {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      background: var(--bg);
+    }
+
+    /* ===== SLIDES ===== */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow: hidden;
+      padding: 22px 36px 28px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ===== SLIDE INNER CARD ===== */
+    .slide-card {
+      width: 1200px;
+      background: var(--slide-bg);
+      border-radius: 6px;
+      padding: 16px 32px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ===== HEADER ===== */
+    .slide-header {
+      text-align: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+    .main-title {
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .divider {
+      width: 100%; height: 1px;
+      background: var(--border);
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    /* ===== SECTION LABEL ===== */
+    .section-label {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: var(--gold);
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    /* ===== NOTES ===== */
+    .notes {
+      margin-bottom: 10px;
+      padding-left: 4px;
+      flex-shrink: 0;
+    }
+    .notes li {
+      list-style: none;
+      padding-left: 311px;
+      position: relative;
+      font-size: 12px;
+      color: #cccccc;
+      line-height: 1.65;
+    }
+    .notes li::before {
+      content: "•";
+      position: absolute;
+      left: 298px;
+      color: var(--white);
+    }
+
+    /* ===== TABLE ===== */
+    .table-wrap {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      vertical-align: middle;
+      line-height: 1.6;
+    }
+    th {
+      background: var(--header-bg);
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+    }
+    td { background: var(--row-bg); color: var(--white); }
+
+    .col-area    { width: 28%; }
+    .col-contact { width: 16%; text-align: center; }
+    .col-scope   { width: 11%; text-align: center; vertical-align: middle; }
+    .col-remark  { width: 45%; }
+
+    td.col-area {
+      color: var(--white);
+      font-weight: 600;
+    }
+    /* 斑马纹：奇数行（1,3,5...）第一列背景略深 */
+    tr:nth-child(odd) td.col-area {
+      background: #1a1a1a;
+    }
+    td.col-area .sub {
+      display: block;
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    td.col-contact { color: #dddddd; }
+    td.col-remark  { font-size: 12px; color: #cccccc; line-height: 1.65; }
+
+    .tag-yes  { color: var(--yes);  font-weight: 700; }
+    .tag-flex { color: var(--flex); font-weight: 700; }
+    .tag-no   { color: var(--no);   font-weight: 700; }
+
+    /* ===== NEXT STEP CARDS ===== */
+    .cards-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      flex: 1;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 18px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      width: 700px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .card-body {
+      font-size: 13px;
+      color: #cccccc;
+      line-height: 1.65;
+    }
+
+    /* ===== NAV ARROWS ===== */
+    .nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px; height: 44px;
+      background: rgba(212,175,55,0.12);
+      border: 1px solid rgba(212,175,55,0.35);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 100;
+      transition: background 0.2s;
+      user-select: none;
+      color: var(--gold);
+      font-size: 20px;
+      line-height: 1;
+    }
+    .nav:hover { background: rgba(212,175,55,0.28); }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+    .nav.hidden { opacity: 0; pointer-events: none; }
+
+    /* ===== PAGE INDICATORS ===== */
+    .indicators {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      border: 1px solid rgba(212,175,55,0.4);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .dot.active { background: var(--gold); }
+
+    /* ===== SCREENSHOT MODE: hide nav/dots ===== */
+    body.screenshot-mode .nav,
+    body.screenshot-mode .indicators { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="deck" id="deck">
+
+    <!-- ========== SLIDE 1: HIGHLIGHT ========== -->
+    <div class="slide active" id="slide-0">
+      <div class="slide-card">
+
+        <div class="slide-header">
+          <div class="main-title">Project Show Me The Money</div>
+          <div class="subtitle">(Coupa)</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-label">HIGHLIGHT</div>
+
+        <ul class="notes">
+          <li>For China team, Supplier scorecard will not be in Coupa, because Coupa function does not fit e.l.f.</li>
+          <li>Global Sourcing team can still continue to explore if use supplier scorecard function in Coupa.</li>
+        </ul>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-area">Explore Areas</th>
+                <th class="col-contact">Business Contact</th>
+                <th class="col-scope">In Project Scope</th>
+                <th class="col-remark">Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- ========== YES GROUP: scope rowspan=4 ========== -->
+              <tr>
+                <td class="col-area">Purchase order confirmation</td>
+                <td class="col-contact">Jue Zhou</td>
+                <td class="col-scope" rowspan="4"><span class="tag-yes">Yes</span></td>
+                <td class="col-remark" rowspan="2">These are PO related topic, will continue to do deep dive analysis.</td>
+              </tr>
+              <tr>
+                <td class="col-area">Delivery schedule</td>
+                <td class="col-contact">Jue Zhou</td>
+              </tr>
+              <tr>
+                <td class="col-area">Tier 2 Supplier information management</td>
+                <td class="col-contact">Doris Zhang</td>
+                <td class="col-remark"></td>
+              </tr>
+              <tr>
+                <td class="col-area">Supplier onboarding – System registration</td>
+                <td class="col-contact">Joyee Wu</td>
+                <td class="col-remark"></td>
+              </tr>
+
+              <!-- ========== FLEXIBLE GROUP: scope rowspan=3 ========== -->
+              <tr>
+                <td class="col-area">Supplier onboarding – Qualification</td>
+                <td class="col-contact">Doris Zhang</td>
+                <td class="col-scope" rowspan="3"><span class="tag-flex">Flexible</span></td>
+                <td class="col-remark" rowspan="3">Will continue to explore whether Coupa is the right application to support the processes.</td>
+              </tr>
+              <tr>
+                <td class="col-area">Document sharing<span class="sub">(Share SOP document with suppliers)</span></td>
+                <td class="col-contact">Vicki Zhou</td>
+                <td class="col-remark"></td>
+              </tr>
+              <tr>
+                <td class="col-area">Forecast sharing</td>
+                <td class="col-contact">Ares Chen</td>
+                <td class="col-remark"></td>
+              </tr>
+
+              <!-- ========== NO GROUP: scope rowspan=2 ========== -->
+              <tr>
+                <td class="col-area">Performance management<span class="sub">(Include supplier scorecards)</span></td>
+                <td class="col-contact">Doris Zhang</td>
+                <td class="col-scope" rowspan="2"><span class="tag-no">No</span></td>
+                <td class="col-remark">Confirmed not in scope. Coupa supplier scorecard not fit e.l.f supplier evaluation process.</td>
+              </tr>
+              <tr>
+                <td class="col-area">Price management</td>
+                <td class="col-contact">/</td>
+                <td class="col-remark">Confirmed not in scope. Coupa price management not fit e.l.f supplier quote management.</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /slide-card -->
+    </div><!-- /slide 1 -->
+
+
+    <!-- ========== SLIDE 2: NEXT STEP ========== -->
+    <div class="slide" id="slide-1">
+      <div class="slide-card">
+
+        <div class="slide-header">
+          <div class="main-title">Project Show Me The Money</div>
+          <div class="subtitle">(Coupa)</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-label">NEXT STEP</div>
+
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-title">PR vs PO Collaboration</div>
+            <div class="card-body">
+              Process change: Analyze whether change from PR collaboration to PO collaboration to fully use Coupa function.
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Forecast Sharing Demo</div>
+            <div class="card-body">
+              Demonstrate forecast sharing to the business.
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Tier 2 Supplier</div>
+            <div class="card-body">
+              Review and analyze Tier two supplier information process and maintenance in Coupa.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /slide-card -->
+    </div><!-- /slide 2 -->
+
+  </div><!-- /deck -->
+
+  <!-- ===== NAV ARROWS ===== -->
+  <div class="nav nav-prev hidden" id="nav-prev" onclick="go(-1)">&#8592;</div>
+  <div class="nav nav-next" id="nav-next" onclick="go(1)">&#8594;</div>
+
+  <!-- ===== INDICATORS ===== -->
+  <div class="indicators">
+    <div class="dot active" onclick="goTo(0)"></div>
+    <div class="dot"        onclick="goTo(1)"></div>
+  </div>
+
+  <script>
+    const TOTAL = 2;
+    let cur = 0;
+
+    function goTo(n) {
+      document.getElementById('slide-' + cur).classList.remove('active');
+      document.querySelectorAll('.dot')[cur].classList.remove('active');
+      cur = n;
+      document.getElementById('slide-' + cur).classList.add('active');
+      document.querySelectorAll('.dot')[cur].classList.add('active');
+      document.getElementById('nav-prev').classList.toggle('hidden', cur === 0);
+      document.getElementById('nav-next').classList.toggle('hidden', cur === TOTAL - 1);
+    }
+
+    function go(dir) {
+      const next = cur + dir;
+      if (next >= 0 && next < TOTAL) goTo(next);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+    });
+  </script>
+
+</body>
+</html>
